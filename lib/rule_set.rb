@@ -6,6 +6,7 @@ class RuleSet
 
   def initialize(selector_name, *args, &block)
     @selector = Selector.new selector_name
+    @args = args.first
     @declarations = []
     instance_eval(&block) unless block.nil?
   end
@@ -19,11 +20,15 @@ class RuleSet
   end
 
   def compile
-    str = "#{@selector.compile} {\n"
+    str = "#{@selector.compile} #{args}{\n"
     @declarations.each do |d|
       str << "  #{d.compile} \n"
     end
     str << "}\n"
+  end
+
+  def args
+    @args.map{ |a| a.to_s.as_arg }.join(' ') << ' ' unless @args.empty?
   end
 
 

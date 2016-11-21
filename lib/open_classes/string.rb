@@ -13,4 +13,8 @@ class String
       gsub(/([a-z\d])([A-Z])/,'\1-\2').
       downcase
   end
+
+  def as_arg
+    ":#{self}"
+  end
 end

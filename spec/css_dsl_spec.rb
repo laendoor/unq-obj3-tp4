@@ -44,6 +44,18 @@ describe CssDSL do
 
       expect(css.compile.minify).to eq css_expected
     end
+
+    it 'compila someClass con argumento :hover' do
+      css = CssDSL.new.stylesheet do
+        a_someClass(:hover) {
+          color :blue
+        }
+      end
+
+      css_expected = 'a.someClass :hover { color: blue; }'
+
+      expect(css.compile.minify).to eq css_expected
+    end
   end
 
 end
