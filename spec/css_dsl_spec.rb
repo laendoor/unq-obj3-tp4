@@ -2,30 +2,48 @@ require 'spec_helper'
 
 describe CssDSL do
 
-  it 'compile selectors' do
-    css = CssDSL.new.stylesheet do
-      body
-      _class {}
-      __id
-      div_class
-      h1__id {}
+  describe 'Parte 1: clases, IDs y propiedades básicas de CSS' do
+    it 'compila selectores' do
+      css = CssDSL.new.stylesheet do
+        body
+        _class {}
+        __id
+        div_class
+        h1__id {}
+      end
+
+      css_expected = 'body {} .class {} #id {} div.class {} h1#id {}'
+
+      expect(css.compile.minify).to eq css_expected
     end
 
-    css_expected = 'body { }; .class { }; #id { }; div.class { }; h1#id { };'
+    it 'compila .claseSuelta con propiedad fontSize' do
+      css = CssDSL.new.stylesheet do
+        _claseSuelta {
+          fontSize 16.px
+        }
+      end
 
-    expect(css.compile.minify).to eq css_expected
-  end
+      css_expected = '.claseSuelta { font-size: 16px; }'
 
-  it 'compile body tag-rule with font-size declaration' do
-    css = CssDSL.new.stylesheet do
-      body {
-        fontSize 16.px
-      }
+      expect(css.compile.minify).to eq css_expected
     end
 
-    css_expected = 'body { font-size: 16px; };'
+    it 'compila body con propiedades background' do
+      css = CssDSL.new.stylesheet do
+        body {
+          background {
+            color rgb(255,0,255)
+            width 80.px
+            height 80.px
+          }
+        }
+      end
 
-    expect(css.compile.minify).to eq css_expected
+      css_expected = 'body { background-color: #FF00FF; background-size: 80px 80px; }'
+
+      expect(css.compile.minify).to eq css_expected
+    end
   end
 
 end

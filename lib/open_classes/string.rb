@@ -3,7 +3,7 @@ class String
     self
       .gsub(/\n/, ' ')
       .gsub(/\s{2,}/, ' ')
-      .gsub(/\}/, '};')
+      .gsub(/{ }/, '{}')
       .strip
   end
 

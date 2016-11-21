@@ -1,7 +1,7 @@
 require_relative 'open_classes/string'
 
 class Declaration
-  def initialize(name, value)
+  def initialize(name, *value, &block)
     @name  = name
     @value = value
   end
@@ -9,4 +9,5 @@ class Declaration
   def compile
     "#{@name.to_s.hyphen}: #{@value.join(', ')};\n"
   end
+
 end

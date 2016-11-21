@@ -1,5 +1,6 @@
 require_relative 'selector'
 require_relative 'declaration'
+require_relative 'background_declaration'
 
 class RuleSet
 
@@ -9,8 +10,12 @@ class RuleSet
     instance_eval(&block) unless block.nil?
   end
 
-  def method_missing(property, *values, &block)
-    @declarations << Declaration.new(property, values)
+  def method_missing(property, *args, &block)
+    if property.equal? :background
+      @declarations << BackgroundDeclaration.new(property, args, &block)
+    else
+      @declarations << Declaration.new(property, args, &block)
+    end
   end
 
   def compile
