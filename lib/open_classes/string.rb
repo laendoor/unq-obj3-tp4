@@ -14,7 +14,7 @@ class String
       downcase
   end
 
-  def as_arg
+  def as_selector_prop
     ":#{self}"
   end
 end

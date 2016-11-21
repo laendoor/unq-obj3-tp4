@@ -1,34 +1,45 @@
 require_relative 'selector'
-require_relative 'declaration'
-require_relative 'background_declaration'
+require_relative 'rule'
+require_relative 'background_rule'
 
 class RuleSet
 
-  def initialize(selector_name, *args, &block)
-    @selector = Selector.new selector_name
-    @args = args.first
-    @declarations = []
+  # Un conjunto de reglas contiene un selector (al cual se le aplicarán las reglas)
+  # y un conjunto de reglas. Las reglas llegan en forma de bloque
+  # selector :param? {
+  #   regla1 propiedades
+  #   regla2 propiedades
+  #   ...
+  # }
+  def initialize(name, *args, &block)
+    @selector = Selector.new(name, args)
+    @rules = []
     instance_eval(&block) unless block.nil?
   end
 
+  # Permite capturar el comportamiento de las reglas
+  # Una regla puede ser simple o bien contener un subconjunto de reglas
+  # Según el caso se inicializa una clase u otra
   def method_missing(property, *args, &block)
     if property.equal? :background
-      @declarations << BackgroundDeclaration.new(property, args, &block)
+      @rules << BackgroundRule.new(property, &block)
     else
-      @declarations << Declaration.new(property, args, &block)
+      @rules << Rule.new(property, args)
     end
   end
 
+  # La compilación del set de reglas se estructura con la compilacion
+  # del selector, y la compilación de las reglas dentro de llaves {}
+  # selector :arg1?, .., :arg2? {
+  #   prop1: value1 .. valueN
+  #   ..
+  # }
   def compile
-    str = "#{@selector.compile} #{args}{\n"
-    @declarations.each do |d|
+    str = "#{@selector.compile} {\n"
+    @rules.each do |d|
       str << "  #{d.compile} \n"
     end
     str << "}\n"
-  end
-
-  def args
-    @args.map{ |a| a.to_s.as_arg }.join(' ') << ' ' unless @args.empty?
   end
 
 

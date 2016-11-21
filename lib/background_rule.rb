@@ -1,11 +1,12 @@
 require_relative 'open_classes/string'
 
-class BackgroundDeclaration
+class BackgroundRule
 
-  def initialize(name, *args, &declarations)
-    @name  = name
-    @declarations = {}
+  def initialize(name, &declarations)
+    @name  = name.to_s + '-'
+    @rules = {}
     instance_eval(&declarations) unless declarations.nil?
+    @rules = @rules.map { |k, v| Rule.new(@name + k.to_s, v) }
   end
 
 
@@ -15,33 +16,29 @@ class BackgroundDeclaration
     if [:width, :height].include? declaration
       set_size(declaration, values)
     else
-      @declarations[declaration] = values
+      @rules[declaration] = values
     end
   end
 
   # Sintaxis de las propiedades de
   def compile
-    name = @name.to_s.hyphen
-    str = ''
-    @declarations.each do |k, v|
-      str << "#{name + '-' + k.to_s.hyphen}: #{v.join(' ')};\n"
-    end
-    str
+    @rules.map { |r| r.compile }.join
   end
 
   # Las propiedades width y height compilan a
-  #   => 'background-size: width-value height-value'
+  #   => 'size: width-value height-value'
   #
   # Se genera la propiedad :size con valores por defecto :auto
-  #   => 'background-size: auto auto'
+  #   => 'size: auto auto'
   #
   # Al querer setear alguna de las dos, se sobreescribe el valor correspondiente.
   def set_size(declaration, value)
-    @declarations[:size] = [:auto, :auto] unless @declarations.key? :size
+    @rules[:size] = [:auto, :auto] unless @rules.key? :size
 
-    @declarations[:size] = declaration.equal?(:width) ? [value, @declarations[:size][1]] : [@declarations[:size][0], value]
+    @rules[:size] = declaration.equal?(:width) ? [value, @rules[:size][1]] : [@rules[:size][0], value]
   end
 
+  # Convierto un color de rgb a hex
   def rgb(r, g, b)
     "##{to_hex r}#{to_hex g}#{to_hex b}"
   end

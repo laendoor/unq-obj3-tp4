@@ -2,22 +2,29 @@ require_relative 'rule_set'
 
 class CssDSL
 
+  # Una hoja de estilos es un listado de sets de reglas
   def initialize
-    @rules = []
+    @rule_sets = []
   end
 
-  def compile
-    @rules.map{ |r| r.compile }.join
-  end
-
-  def method_missing(selector, *args, &block)
-    @rules << RuleSet.new(selector, args, &block)
-    self
-  end
-
+  # Método que permite la inicialización del DSL
   def stylesheet(&block)
     instance_eval(&block) unless block.nil?
   end
 
+  # Al compilar a css se compila cada set de reglas
+  def compile
+    @rule_sets.map{ |r| r.compile }.join
+  end
+
+  # Cada set de reglas se interpreta como un método, parámetros y un bloque.
+  # Se asume que esa construcción es un Set de Reglas:
+  # selector :param? {
+  #   regla propiedades
+  # }
+  def method_missing(selector, *args, &block)
+    @rule_sets << RuleSet.new(selector, args, &block)
+    self
+  end
 
 end
