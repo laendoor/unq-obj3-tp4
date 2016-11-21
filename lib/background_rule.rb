@@ -1,7 +1,12 @@
+require_relative 'helpers/color'
 require_relative 'open_classes/string'
 
 class BackgroundRule
+  include Color
 
+  # La regla de background procesa el bloque
+  # para lograr capturar las sub-reglas y armar
+  # el listado de reglas de background
   def initialize(name, &declarations)
     @name  = name.to_s + '-'
     @rules = {}
@@ -36,15 +41,6 @@ class BackgroundRule
     @rules[:size] = [:auto, :auto] unless @rules.key? :size
 
     @rules[:size] = declaration.equal?(:width) ? [value, @rules[:size][1]] : [@rules[:size][0], value]
-  end
-
-  # Convierto un color de rgb a hex
-  def rgb(r, g, b)
-    "##{to_hex r}#{to_hex g}#{to_hex b}"
-  end
-
-  def to_hex(n)
-    n.to_s(16).rjust(2, '0').upcase
   end
 
 end

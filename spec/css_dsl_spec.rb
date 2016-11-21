@@ -58,4 +58,28 @@ describe CssDSL do
     end
   end
 
+  describe 'Parte 2: Variables' do
+    it 'compila utilizando variables' do
+      css = CssDSL.new.stylesheet do
+        let fondo = rgb(255, 0, 255)
+
+        div_someDivClass {
+          background {
+            color fondo
+          }
+        }
+
+        footer {
+          background {
+            color fondo
+          }
+        }
+      end
+
+      css_expected = 'div.someDivClass { background-color: #FF00FF; } footer { background-color: #FF00FF; }'
+
+      expect(css.compile.minify).to eq css_expected
+    end
+  end
+
 end

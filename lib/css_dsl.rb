@@ -1,6 +1,8 @@
 require_relative 'rule_set'
+require_relative 'helpers/color'
 
 class CssDSL
+  include Color
 
   # Una hoja de estilos es un listado de sets de reglas
   def initialize
@@ -23,7 +25,7 @@ class CssDSL
   #   regla propiedades
   # }
   def method_missing(selector, *args, &block)
-    @rule_sets << RuleSet.new(selector, args, &block)
+    @rule_sets << RuleSet.new(selector, args, &block) unless selector.equal?(:let)
     self
   end
 
