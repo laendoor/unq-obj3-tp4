@@ -82,4 +82,27 @@ describe CssDSL do
     end
   end
 
+  describe 'Parte 3: Mixins' do
+    it 'compila utilizando mixins' do
+      css = CssDSL.new.stylesheet do
+        mixin(:noDecoration) {
+          display :block
+          textDecoration :none
+        }
+
+        a {
+          with :noDecoration
+        }
+
+        li_algo {
+          with :noDecoration
+        }
+      end
+
+      css_expected = 'a { display: block; text-decoration: none; } li.algo { display: block; text-decoration: none; }'
+
+      expect(css.compile.minify).to eq css_expected
+    end
+  end
+
 end
