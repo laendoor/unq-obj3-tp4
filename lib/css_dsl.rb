@@ -1,17 +1,17 @@
-require_relative 'rule'
+require_relative 'rule_set'
 
-class Css
+class CssDSL
 
   def initialize
     @rules = []
   end
 
-  def compiled
-    @rules.map{ |r| r.compiled }.join
+  def compile
+    @rules.map{ |r| r.compile }.join
   end
 
   def method_missing(selector, *args, &block)
-    @rules << Rule.new(selector, args, &block)
+    @rules << RuleSet.new(selector, args, &block)
     self
   end
 
