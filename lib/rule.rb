@@ -21,18 +21,12 @@ class Rule
   # Parsea los selectores
   #
   # tag    => tag
-  # clase! => .clase
-  # id?    => #id
+  # _clase => .clase
+  # __id   => #id
   #
   # FIXME seguro se puede hacer algo más lindo
   def parse(selector)
-    if selector.to_s.end_with? '?'
-      '#' << selector.to_s.chop
-    elsif selector.to_s.end_with? '!'
-      '.' << selector.to_s.chop
-    else
-      selector
-    end
+    selector.to_s.gsub(/__/, '#').gsub(/_/, '.')
   end
 
 

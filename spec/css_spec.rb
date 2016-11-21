@@ -1,10 +1,21 @@
 require 'spec_helper'
 require_relative '../lib/open_classes/fixnum'
+require_relative '../lib/open_classes/string'
 
 describe Css do
 
-  it 'assert true' do
-    expect(true).to be true
+  it 'parse different selectors' do
+    css = Css.new.stylesheet do
+      body
+      _class {}
+      __id
+      div_class
+      h1__id {}
+    end
+
+    css_expected = 'body { }; .class { }; #id { }; div.class { }; h1#id { };'
+
+    expect(css.compiled.minify).to eq css_expected
   end
 
   it 'compile simple tag-rule with one declaration' do
@@ -14,42 +25,9 @@ describe Css do
       }
     end
 
-    css_expected = %q{body {
-  fontSize: 16px;
-}
-}
+    css_expected = 'body { fontSize: 16px; };'
 
-    expect(css.compiled).to eq css_expected
-  end
-
-  it 'parse class selector with .' do
-    css = Css.new.stylesheet do
-      clase! {
-        font 20.px
-      }
-    end
-
-    css_expected = %q{.clase {
-  font: 20px;
-}
-}
-
-    expect(css.compiled).to eq css_expected
-  end
-
-  it 'parse id selector with #' do
-    css = Css.new.stylesheet do
-      id? {
-        font 20.px
-      }
-    end
-
-    css_expected = %q{#id {
-  font: 20px;
-}
-}
-
-    expect(css.compiled).to eq css_expected
+    expect(css.compiled.minify).to eq css_expected
   end
 
 end
