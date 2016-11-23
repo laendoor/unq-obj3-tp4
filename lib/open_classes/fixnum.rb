@@ -1,5 +1,7 @@
+require_relative '../helpers/px_num'
+
 class Fixnum
   def px
-    self.to_s + 'px'
+    PxNum.new self
   end
 end

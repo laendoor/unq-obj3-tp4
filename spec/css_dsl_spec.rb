@@ -105,4 +105,31 @@ describe CssDSL do
     end
   end
 
+  describe 'Bonus 1: dimensiones y colores' do
+    it 'compila operando dimensiones y colores' do
+      css = CssDSL.new.stylesheet do
+        let delta_tono = rgb(40, 40, 40)
+        let delta_size = 2.px
+
+        _claseClara {
+          fontSize 16.px + delta_size
+          background {
+            color rgb(120,50,70) + delta_tono
+          }
+        }
+
+        _claseOscura {
+          fontSize 16.px - delta_size
+          background {
+            color rgb(120,50,70) - delta_tono
+          }
+        }
+      end
+
+      css_expected = '.claseClara { font-size: 18px; background-color: #A05A6E; } .claseOscura { font-size: 14px; background-color: #500A1E; }'
+
+      expect(css.compile.minify).to eq css_expected
+    end
+  end
+
 end
