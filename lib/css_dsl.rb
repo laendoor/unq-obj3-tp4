@@ -1,5 +1,4 @@
 require_relative 'rule_set'
-require_relative 'mixin_rule_set'
 require_relative 'helpers/color'
 
 class CssDSL
@@ -7,7 +6,6 @@ class CssDSL
 
   # Una hoja de estilos es un listado de sets de reglas
   def initialize
-    @mixins = []
     @rule_sets = []
   end
 
@@ -28,9 +26,12 @@ class CssDSL
   # }
   def method_missing(selector, *args, &block)
     if selector.equal? :mixin
-      @mixins << MixinRuleSet.new(args.first, &block)
+      name, *params = args
+      RuleSet.send(:define_method, name) do
+        RuleSet.new(name, params, &block)
+      end
     else
-      @rule_sets << RuleSet.new(selector, @mixins, args, &block) unless selector.equal?(:let)
+      @rule_sets << RuleSet.new(selector, args, &block) unless selector.equal?(:let)
     end
 
     self

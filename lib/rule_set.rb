@@ -1,8 +1,13 @@
-require_relative 'selector'
 require_relative 'rule'
+require_relative 'selector'
 require_relative 'background_rule'
 
 class RuleSet
+  attr_accessor :selector, :rules
+
+  # Existen nombres de propiedades de css que son métodos de Object
+  # Es necesario "quitarlos" de la clase para poder capturarlos con method_missing
+  undef_method :display
 
   # Un conjunto de reglas contiene un selector (al cual se le aplicarán las reglas)
   # y un conjunto de reglas. Las reglas llegan en forma de bloque
@@ -11,10 +16,9 @@ class RuleSet
   #   regla2 propiedades
   #   ...
   # }
-  def initialize(name, mixins, *args, &block)
-    @selector = Selector.new(name, args)
-    @mixins = mixins
-    @rules = []
+  def initialize(name, *args, &block)
+    self.selector = Selector.new(name, args)
+    self.rules = []
     instance_eval(&block) unless block.nil?
   end
 
@@ -27,32 +31,28 @@ class RuleSet
   # En ese caso (si es que también existe el mixin) en vez de agregar la regla :with
   # se agregan las reglas del mixin.
   def method_missing(property, *args, &block)
-    if property_has_mixin(property, args.first)
-      mixin_rules(args.first).each { |rule| @rules << rule }
+    if is_mixin?(property, args.first)
+      self.rules += args.first.rules
     elsif property.equal? :background
-      @rules << BackgroundRule.new(property, &block)
+      rules << BackgroundRule.new(property, &block)
     else
-      @rules << Rule.new(property, args)
+      rules << Rule.new(property, args)
     end
   end
 
-  # Verifica que la propiedad utilice el keyword with y además que exista un mixin asociado al argumento de with
+  # Verifica que la propiedad utilice el keyword with
+  # y además que lo que recibe sea un conjunto de reglas
+  # obtenidas como resultado de la ejecución del método asociado al mixin
+  #
   # a {
-  #   with: noDecoration
+  #   with noDecoration
   # }
   # mixin :noDecoration {
   #  display: block,
   #  textDecoration: none;
   # }
-  def property_has_mixin(property, name)
-    property.equal?(:with) && @mixins.select{ |m| m.name.equal?(name) }.size > 0
-  end
-
-
-  # Obtiene las reglas del primer mixin que matchee
-  # Precondición: existe al menos un mixin que matchea
-  def mixin_rules(name)
-    @mixins.select { |m| m.name.equal?(name) }.first.rules
+  def is_mixin?(property, name)
+    property.equal?(:with) && name.class.equal?(RuleSet)
   end
 
   # La compilación del set de reglas se estructura con la compilacion
@@ -63,7 +63,7 @@ class RuleSet
   # }
   def compile
     str = "#{@selector.compile} {\n"
-    @rules.each do |d|
+    rules.each do |d|
       str << "  #{d.compile} \n"
     end
     str << "}\n"

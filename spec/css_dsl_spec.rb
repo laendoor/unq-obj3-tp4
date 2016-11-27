@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe CssDSL do
 
-  describe 'Parte 1: clases, IDs y propiedades básicas de CSS' do
+  describe 'Parte 1: clases, IDs y propiedades basicas de CSS' do
     it 'compila selectores' do
       css = CssDSL.new.stylesheet do
         body
@@ -85,17 +85,17 @@ describe CssDSL do
   describe 'Parte 3: Mixins' do
     it 'compila utilizando mixins' do
       css = CssDSL.new.stylesheet do
-        mixin(:noDecoration) {
+        mixin (:noDecoration) {
           display :block
           textDecoration :none
         }
 
         a {
-          with :noDecoration
+          with noDecoration
         }
 
         li_algo {
-          with :noDecoration
+          with noDecoration
         }
       end
 
