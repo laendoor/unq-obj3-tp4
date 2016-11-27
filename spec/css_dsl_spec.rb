@@ -142,12 +142,21 @@ describe CssDSL do
           paddingLeft :ancho
         }
 
+        mixin(:inline_espacios, :alto, :ancho) {
+          padding(:alto, :ancho, :alto, :ancho)
+        }
+
         div_conEspacios {
           with espacios(20.px, 40.px)
+        }
+
+        div_inlineConEspacios {
+          with inline_espacios(20.px, 40.px)
         }
       end
 
       css_expected = 'div.conEspacios { padding-top: 20px; padding-right: 40px; padding-bottom: 20px; padding-left: 40px; }'
+      css_expected += ' div.inlineConEspacios { padding: 20px 40px 20px 40px; }'
 
       expect(css.compile.minify).to eq css_expected
     end

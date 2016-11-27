@@ -5,7 +5,7 @@ require_relative 'background_rule'
 class RuleSet
   attr_accessor :selector, :rules
 
-  # Existen nombres de propiedades de css que son métodos de Object
+  # Existen nombres de propiedades de css que son métodos de Object.
   # Es necesario "quitarlos" de la clase para poder capturarlos con method_missing
   undef_method :display
 
@@ -20,6 +20,7 @@ class RuleSet
     self.selector = Selector.new(name, args)
     self.rules = []
     @params = args.first.class.equal?(Hash) ? args.first : {}
+    @class_map = { :background => BackgroundRule }
     instance_eval(&block) unless block.nil?
   end
 
@@ -34,11 +35,13 @@ class RuleSet
   def method_missing(property, *args, &block)
     if is_mixin?(property, args.first)
       self.rules += args.first.rules
-    elsif property.equal? :background
-      rules << BackgroundRule.new(property, &block)
     else
-      rules << Rule.new(property, values(args))
+      rules << get_rule(property).new(property, values(args), &block)
     end
+  end
+
+  def get_rule(property)
+    @class_map.has_key?(property) ? @class_map[property] : Rule
   end
 
   def values(args)
@@ -60,7 +63,7 @@ class RuleSet
     property.equal?(:with) && name.class.equal?(RuleSet)
   end
 
-  # La compilación del set de reglas se estructura con la compilacion
+  # La compilación del set de reglas se estructura con la compilación
   # del selector, y la compilación de las reglas dentro de llaves {}
   # selector :arg1?, .., :arg2? {
   #   prop1: value1 .. valueN
@@ -73,6 +76,5 @@ class RuleSet
     end
     str << "}\n"
   end
-
 
 end

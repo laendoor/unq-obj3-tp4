@@ -7,7 +7,7 @@ class BackgroundRule
   # La regla de background procesa el bloque
   # para lograr capturar las sub-reglas y armar
   # el listado de reglas de background
-  def initialize(name, &declarations)
+  def initialize(name, args, &declarations)
     @name  = name.to_s + '-'
     @rules = {}
     instance_eval(&declarations) unless declarations.nil?
