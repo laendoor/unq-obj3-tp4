@@ -132,4 +132,25 @@ describe CssDSL do
     end
   end
 
+  describe 'Bonus 2: parametrizar mixins' do
+    it 'compila parametrizando mixins' do
+      css = CssDSL.new.stylesheet do
+        mixin(:espacios, :alto, :ancho) {
+          paddingTop :alto
+          paddingRight :ancho
+          paddingBottom :alto
+          paddingLeft :ancho
+        }
+
+        div_conEspacios {
+          with espacios(20.px, 40.px)
+        }
+      end
+
+      css_expected = 'div.conEspacios { padding-top: 20px; padding-right: 40px; padding-bottom: 20px; padding-left: 40px; }'
+
+      expect(css.compile.minify).to eq css_expected
+    end
+  end
+
 end

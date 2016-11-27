@@ -27,8 +27,8 @@ class CssDSL
   def method_missing(selector, *args, &block)
     if selector.equal? :mixin
       name, *params = args
-      RuleSet.send(:define_method, name) do
-        RuleSet.new(name, params, &block)
+      RuleSet.send(:define_method, name) do |*method_args|
+        RuleSet.new(name, Hash[params.zip(method_args)], &block)
       end
     else
       @rule_sets << RuleSet.new(selector, args, &block) unless selector.equal?(:let)

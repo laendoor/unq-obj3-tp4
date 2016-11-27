@@ -19,6 +19,7 @@ class RuleSet
   def initialize(name, *args, &block)
     self.selector = Selector.new(name, args)
     self.rules = []
+    @params = args.first.class.equal?(Hash) ? args.first : {}
     instance_eval(&block) unless block.nil?
   end
 
@@ -36,8 +37,12 @@ class RuleSet
     elsif property.equal? :background
       rules << BackgroundRule.new(property, &block)
     else
-      rules << Rule.new(property, args)
+      rules << Rule.new(property, values(args))
     end
+  end
+
+  def values(args)
+    args.map { |arg| @params.has_key?(arg) ? @params[arg] : arg }
   end
 
   # Verifica que la propiedad utilice el keyword with
